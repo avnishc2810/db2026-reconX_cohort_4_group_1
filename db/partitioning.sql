@@ -26,13 +26,24 @@ CREATE TABLE trades (
     PRIMARY KEY (id, trade_date)
 ) PARTITION BY RANGE (trade_date);
 
+
+
+CREATE INDEX idx_trades_status ON trades(status);
+
+CREATE INDEX idx_trades,instrument_id ON trades(instrument_id);
+
+CREATE INDEX idx_trades_counterparty_id ON trades(counterparty_id);
 -- 3. Per-month partitions (12-month rolling window). Add new ones on schedule.
+CREATE TABLE trades_y2026m05 PARTITION OF trades
+    FOR VALUES FROM ('2026-04-01') TO ('2026-05-01');
 CREATE TABLE trades_y2026m05 PARTITION OF trades
     FOR VALUES FROM ('2026-05-01') TO ('2026-06-01');
 CREATE TABLE trades_y2026m06 PARTITION OF trades
     FOR VALUES FROM ('2026-06-01') TO ('2026-07-01');
 CREATE TABLE trades_y2026m07 PARTITION OF trades
     FOR VALUES FROM ('2026-07-01') TO ('2026-08-01');
+
+CREATE TABLE trades_default PARTITION OF trades DEFAULT;
 
 -- 4. Migrate data
 INSERT INTO trades SELECT * FROM trades_legacy;
