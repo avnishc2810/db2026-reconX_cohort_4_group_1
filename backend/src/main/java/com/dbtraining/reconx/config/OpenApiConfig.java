@@ -40,6 +40,20 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class OpenApiConfig {
-
+  @Bean
+    public OpenAPI reconxOpenAPI() {
+        return new OpenAPI()
+             .info(new Info()
+                 .title("ReconX API")
+                 .version("v1")
+                 .description("Enterprise Trade Reconciliation Platform (Advanced Track)")
+                 .contact(new Contact().name("DB TDI Training").email("tdi@db.com")))
+             .components(new Components().addSecuritySchemes("bearerAuth",
+                 new SecurityScheme()
+                     .type(SecurityScheme.Type.HTTP)
+                     .scheme("bearer")
+                     .bearerFormat("JWT")))
+             .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
+     }
     // TODO(TICKET-ADV058): define the reconxOpenAPI() @Bean — see comments above.
 }
