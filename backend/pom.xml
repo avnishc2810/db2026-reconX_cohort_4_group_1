@@ -207,7 +207,7 @@
                             <version>${mapstruct.version}</version>
                         </path>
                     </annotationProcessorPaths>
-                </configuration>ui
+                </configuration>
             </plugin>
             <!-- ADV046 / ADV156 — JaCoCo coverage gate (>=85%) -->
             <plugin>
