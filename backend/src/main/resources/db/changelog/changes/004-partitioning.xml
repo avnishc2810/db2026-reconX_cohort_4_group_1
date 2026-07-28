@@ -62,7 +62,7 @@ CREATE TABLE trades (
 
 CREATE INDEX idx_trades_status ON trades(status);
 
-CREATE INDEX idx_trades,instrument_id ON trades(instrument_id);
+CREATE INDEX idx_trades_instrument_id ON trades(instrument_id);
 
 CREATE INDEX idx_trades_counterparty_id ON trades(counterparty_id);
 -- 3. Per-month partitions (12-month rolling window). Add new ones on schedule.
