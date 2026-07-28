@@ -20,9 +20,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
  */
 @SpringBootApplication
 @EnableJpaAuditing
-@EnableCaching
-@EnableKafka
-@EnableAsync
+// @EnableCaching
+// @EnableKafka
+// @EnableAsync
 public class ReconxApplication {
 
     public static void main(String[] args) {

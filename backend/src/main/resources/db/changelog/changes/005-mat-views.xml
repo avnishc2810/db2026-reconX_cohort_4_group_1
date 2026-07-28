@@ -37,7 +37,8 @@
                 ON mv_daily_recon_summary (trade_date);
         ]]></sql>
         <rollback>
-            <sql>DROP MATERIALIZED VIEW IF EXISTS mv_daily_recon_summary;</sql>
+            <sql splitStatements = "true">DROP MATERIALIZED VIEW IF EXISTS mv_daily_recon_summary;
+            DROP MATERIALIZED VIEW IF EXISTS my_daily_recon_summary;</sql>
         </rollback>
     </changeSet>
 
