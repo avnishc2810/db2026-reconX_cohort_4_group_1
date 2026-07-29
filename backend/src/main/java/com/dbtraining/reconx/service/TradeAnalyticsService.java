@@ -49,7 +49,7 @@ public class TradeAnalyticsService {
         throw new UnsupportedOperationException("TICKET-ADV036");
     }
 
-    private BigDecimal pnl(EquityTrade t) {
+    public BigDecimal pnl(EquityTrade t) {
         // TODO(TICKET-ADV036): BigDecimal abs = price * qty; SELL -> abs, BUY -> abs.negate().
         throw new UnsupportedOperationException("TICKET-ADV036");
     }
