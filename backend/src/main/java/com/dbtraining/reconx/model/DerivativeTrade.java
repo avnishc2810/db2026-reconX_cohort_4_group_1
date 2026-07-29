@@ -3,7 +3,6 @@ package com.dbtraining.reconx.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
-import java.util.Objects;
 
 /**
  * ============================================================================
@@ -67,9 +66,20 @@ public final class DerivativeTrade implements TradeType {
 }
 @Override public int hashCode() { return tradeRef.hashCode(); }
 
-    @Override public String toString() {
-        // TODO(TICKET-ADV030): "DerivativeTrade[ref=..., TYPE UNDERLYING on date, strike=... CCY, qty=..., expiry=..., side=...]"
-        throw new UnsupportedOperationException("TICKET-ADV030");
+    // NOTE: Deliberately omits counterpartyId and any internal/PII fields.
+
+    @Override
+    public String toString() {
+        return "DerivativeTrade[ref=%s, %s %s on %s, strike=%s %s, qty=%s, expiry=%s, side=%s]"
+                .formatted(tradeRef,
+                        optionType,
+                        underlying,
+                        tradeDate,
+                        strike,
+                        currency.getCurrencyCode(),
+                        quantity,
+                        expiry,
+                        side);
     }
 
     public static final class Builder {
