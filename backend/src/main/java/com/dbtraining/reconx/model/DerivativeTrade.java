@@ -3,7 +3,7 @@ package com.dbtraining.reconx.model;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Currency;
-
+import java.util.Objects;
 /**
  * ============================================================================
  * TICKET-ADV022 — DerivativeTrade with Builder pattern
@@ -63,8 +63,8 @@ public final class DerivativeTrade implements TradeType {
 
     @Override public boolean equals(Object o) {
     return (o instanceof DerivativeTrade other) && tradeRef.equals(other.tradeRef);
-}
-@Override public int hashCode() { return tradeRef.hashCode(); }
+    }
+    @Override public int hashCode() { return tradeRef.hashCode(); }
 
     // NOTE: Deliberately omits counterpartyId and any internal/PII fields.
 
