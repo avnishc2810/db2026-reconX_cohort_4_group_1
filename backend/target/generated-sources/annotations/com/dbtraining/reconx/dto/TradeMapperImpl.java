@@ -1,13 +1,16 @@
 package com.dbtraining.reconx.dto;
 
-import com.dbtraining.reconx.repository.entity.Counterparty;
-import com.dbtraining.reconx.repository.entity.Instrument;
-import com.dbtraining.reconx.repository.entity.Trade;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+
 import javax.annotation.processing.Generated;
+
 import org.springframework.stereotype.Component;
+
+import com.dbtraining.reconx.repository.entity.Counterparty;
+import com.dbtraining.reconx.repository.entity.Instrument;
+import com.dbtraining.reconx.repository.entity.Trade;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
