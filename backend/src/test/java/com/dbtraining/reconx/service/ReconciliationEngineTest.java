@@ -1,14 +1,17 @@
 package com.dbtraining.reconx.service;
 
-import com.dbtraining.reconx.dto.ReconResult;
-import com.dbtraining.reconx.model.*;
-import org.junit.jupiter.api.Test;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import org.junit.jupiter.api.Test;
+
+import com.dbtraining.reconx.dto.ReconResult;
+import com.dbtraining.reconx.model.EquityTrade;
+import com.dbtraining.reconx.model.ReconciliationRule;
+import com.dbtraining.reconx.model.Side;
+import com.dbtraining.reconx.model.TradeRef;
 
 /**
  * TICKET-ADV040 / ADV041 / ADV042 — TDD: write the test FIRST, then the impl.
@@ -19,8 +22,17 @@ class ReconciliationEngineTest {
 
     @Test
     void testReconcile_exactMatch_returnsMatched() {
-        // TODO(TICKET-ADV040): two identical EquityTrades + EXACT rule -> one ReconResult with status MATCHED.
-        org.junit.jupiter.api.Assertions.fail("TICKET-ADV040 not implemented yet");
+        EquityTrade internal = equity("EQU-20260603-0001", "100.00", "1000");
+        EquityTrade external = equity("EQU-20260603-0001", "100.00", "1000");
+
+        List<ReconResult> out = engine.reconcile(
+                List.of(internal),
+                List.of(external),
+                ReconciliationRule.EXACT);
+
+        assertThat(out).hasSize(1);
+        assertThat(out.get(0).status())
+                .isEqualTo(ReconResult.Status.MATCHED);
     }
 
     @Test
@@ -38,8 +50,12 @@ class ReconciliationEngineTest {
 
     @Test
     void testReconcile_emptyInternal_returnsEmpty() {
-        // TODO(TICKET-ADV040): empty internal + empty external -> reconcile returns an empty list.
-        org.junit.jupiter.api.Assertions.fail("TICKET-ADV040 not implemented yet");
+        List<ReconResult> out = engine.reconcile(
+                List.of(),
+                List.of(),
+                ReconciliationRule.EXACT);
+
+        assertThat(out).isEmpty();
     }
 
     private EquityTrade equity(String ref, String price, String qty) {
