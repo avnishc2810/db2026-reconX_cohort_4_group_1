@@ -33,14 +33,14 @@ public class GlobalExceptionHandler {
         return pd;
     }
 
-    @ExceptionHandler(ReconException.class)
-    public ProblemDetail handleReconConflict(ReconException ex) {
-        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
-        pd.setType(URI.create("https://reconx.dbtraining.com/errors/recon-failure"));
-        pd.setTitle("Reconciliation failure");
-        pd.setProperty("reconBreakId", ex.getReconBreakId());
-        return pd;
-    }
+    // @ExceptionHandler(ReconException.class)
+    // public ProblemDetail handleReconConflict(ReconException ex) {
+    //     ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_ENTITY, ex.getMessage());
+    //     pd.setType(URI.create("https://reconx.dbtraining.com/errors/recon-failure"));
+    //     pd.setTitle("Reconciliation failure");
+    //     pd.setProperty("reconBreakId", ex.getReconBreakId());
+    //     return pd;
+    // }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidation(MethodArgumentNotValidException ex) {
