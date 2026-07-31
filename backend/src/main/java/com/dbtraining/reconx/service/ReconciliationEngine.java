@@ -34,11 +34,16 @@ import java.util.stream.Collectors;
 @Service
 public class ReconciliationEngine {
 
-    @Timed(value = "reconciliation.duration", description = "Wall time of reconcile()",
-           percentiles = {0.5, 0.95, 0.99}, histogram = true)
+    @Timed(
+        value = "reconciliation_duration_seconds",
+        description = "Wall time of reconcile()",
+        percentiles = {0.5, 0.95, 0.99},
+        histogram = true
+    )
     public List<ReconResult> reconcile(List<TradeType> internal,
                                        List<TradeType> external,
                                        ReconciliationRule rule) {
+
         // TODO(TICKET-ADV033): build a Map<tradeRef, TradeType> from `external`
         //   (O(1) lookups beat O(n*m) nested iteration), then parallelStream
         //   over `internal` and call matchOne(in, externalByRef.get(...), rule)
@@ -49,6 +54,7 @@ public class ReconciliationEngine {
         //     return internal.parallelStream()
         //         .map(in -> matchOne(in, externalByRef.get(in.tradeRef().value()), rule))
         //         .toList();
+
         throw new UnsupportedOperationException("TICKET-ADV033");
     }
 
@@ -61,10 +67,12 @@ public class ReconciliationEngine {
             Map<Long, List<TradeType>> internalByCp,
             Map<Long, List<TradeType>> externalByCp,
             ReconciliationRule rule) {
+
         // TODO(TICKET-ADV037): for each counterparty key in internalByCp launch a
         //   CompletableFuture.supplyAsync(() -> reconcile(...)). Combine via
         //   CompletableFuture.allOf(...).thenApply(v -> futures.stream()
         //       .flatMap(f -> f.join().stream()).toList()).
+
         throw new UnsupportedOperationException("TICKET-ADV037");
     }
 
@@ -72,6 +80,7 @@ public class ReconciliationEngine {
         // TODO(TICKET-ADV033): if external is null return ReconResult.breakResult(ref, "MISSING_EXTERNAL", ...).
         //   Otherwise pull priceQty() for both sides, compare via rule.matches(...),
         //   return ReconResult.matched(ref) or breakResult(ref, "VALUE_MISMATCH", details).
+
         throw new UnsupportedOperationException("TICKET-ADV033");
     }
 
@@ -81,6 +90,7 @@ public class ReconciliationEngine {
         //   (EquityTrade, FXTrade, BondTrade, DerivativeTrade) and return a
         //   BigDecimal[]{price, qty}. The compiler enforces exhaustiveness —
         //   omit a case and the build fails.
+
         throw new UnsupportedOperationException("TICKET-ADV018");
     }
 }
