@@ -24,4 +24,8 @@ public record PagedResponse<T>(
                 src.getTotalPages()
         );
     }
+
+    public static <E, T> PagedResponse<T> of(Page<E> page, java.util.function.Function<E, T> mapper) {
+        return from(page, mapper);
+    }
 }
