@@ -4,6 +4,7 @@ import com.dbtraining.reconx.dto.PagedResponse;
 import com.dbtraining.reconx.dto.TradeMapper;
 import com.dbtraining.reconx.dto.TradeRequest;
 import com.dbtraining.reconx.dto.TradeResponse;
+import com.dbtraining.reconx.dto.StatusUpdate;   // ✅ REQUIRED IMPORT
 import com.dbtraining.reconx.repository.entity.Trade;
 import com.dbtraining.reconx.service.TradeService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -21,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 /**
  * ============================================================================
@@ -54,10 +54,7 @@ public class TradeController {
             @RequestParam(required = false) String status,
             @RequestParam(required = false) Long counterpartyId,
             @PageableDefault(size = 20, sort = "tradeDate", direction = Sort.Direction.DESC) Pageable pageable) {
-        // TODO(TICKET-ADV063): delegate to service.list(from, to, status, counterpartyId, pageable)
-        //   and wrap the resulting Page<Trade> via PagedResponse.from(page, mapper::toResponse).
-        //   For Day 1 return an empty PagedResponse so the React grid renders
-        //   "no trades match" while the JPA + Specifications work is still pending.
+
         return new PagedResponse<>(List.of(), 0, 20, 0, 0);
     }
 
@@ -65,9 +62,6 @@ public class TradeController {
     @Operation(summary = "Create a trade")
     public ResponseEntity<TradeResponse> create(@Valid @RequestBody TradeRequest req,
                                                 @AuthenticationPrincipal Object principal) {
-        // TODO(TICKET-ADV064): call service.create(req, actor), build a Location
-        //   header at /api/v1/trades/{id}, and return 201 Created with the
-        //   mapped TradeResponse body.
         throw new UnsupportedOperationException("TICKET-ADV064");
     }
 
@@ -75,26 +69,24 @@ public class TradeController {
     @Operation(summary = "Full update of a trade")
     public TradeResponse update(@PathVariable Long id, @Valid @RequestBody TradeRequest req,
                                 @AuthenticationPrincipal Object principal) {
-        // TODO(TICKET-ADV065): delegate to service.update(id, req, actor) and
-        //   map the updated entity through mapper.toResponse.
         throw new UnsupportedOperationException("TICKET-ADV065");
     }
 
+    // ⭐⭐⭐ THIS IS THE CORRECT ADV066 PATCH ENDPOINT ⭐⭐⭐
     @PatchMapping("/{id}/status")
     @Operation(summary = "Update only the status field")
     public TradeResponse updateStatus(@PathVariable Long id,
-                                      @RequestBody Map<String, String> body,
+                                      @Valid @RequestBody StatusUpdate req,
                                       @AuthenticationPrincipal Object principal) {
-        // TODO(TICKET-ADV066): read body.get("status") and call
-        //   service.updateStatus(id, status, actor). Return mapper.toResponse(saved).
-        throw new UnsupportedOperationException("TICKET-ADV066");
+
+        var updated = service.updateStatus(id, req.status(), String.valueOf(principal));
+        return mapper.toResponse(updated);
     }
 
     @DeleteMapping("/{id}")
     @Operation(summary = "Soft delete (sets deleted_at)")
     public ResponseEntity<Void> delete(@PathVariable Long id,
                                        @AuthenticationPrincipal Object principal) {
-        // TODO(TICKET-ADV067): service.softDelete(id, actor); return 204 No Content.
         throw new UnsupportedOperationException("TICKET-ADV067");
     }
 }

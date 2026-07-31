@@ -16,23 +16,11 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.time.LocalDate;
-import java.util.UUID;
+import java.time.LocalDateTime;
 
 import static com.dbtraining.reconx.repository.TradeSpecifications.*;
 
-/**
- * ============================================================================
- * TICKET-ADV064 — TradeService.create (POST endpoint backing)
- * TICKET-ADV065 — update
- * TICKET-ADV066 — updateStatus (PATCH)
- * TICKET-ADV067 — softDelete
- * TICKET-ADV083 — increments trade_created_total Counter on create
- * TICKET-ADV129 — publishes TradeEvent on every state change
- * TICKET-ADV055/ADV056 — list() uses Specifications + filter query
- * ============================================================================
- */
 @Service
 @Transactional
 public class TradeService {
@@ -56,39 +44,45 @@ public class TradeService {
     }
 
     public Trade create(TradeRequest req, String actor) {
-        // TODO(TICKET-ADV064): reject duplicate tradeRef via DuplicateTradeRefException,
-        //   build a new Trade with instrument + counterparty looked up from
-        //   their repos (throw TradeNotFoundException on miss), status = "PENDING",
-        //   save, then:
-        //     - metrics.incrementTradeCreated() + metrics.recordTradeValue(qty*price) — TICKET-ADV083
-        //     - events.publish(new TradeEvent(... TRADE_CREATED ... actor ...)) — TICKET-ADV129
         throw new UnsupportedOperationException("TICKET-ADV064");
     }
 
     public Trade update(Long id, TradeRequest req, String actor) {
-        // TODO(TICKET-ADV065): load by id (throw TradeNotFoundException if missing),
-        //   copy mutable fields from req, save, publish a TRADE_UPDATED event.
         throw new UnsupportedOperationException("TICKET-ADV065");
     }
 
+    public void softDelete(Long id, String actor) {
+
+    var trade = tradeRepo.findById(id)
+            .orElseThrow(() -> new TradeNotFoundException(id));
+
+    trade.softDelete();                 // sets deletedAt = now
+    trade.setUpdatedBy(actor);          // who performed the delete
+    trade.setUpdatedAt(LocalDateTime.now());
+
+    tradeRepo.save(trade);
+}
+
+
+    // ⭐⭐⭐ THIS IS THE ONLY VALID updateStatus METHOD ⭐⭐⭐
     public Trade updateStatus(Long id, String status, String actor) {
-        // TODO(TICKET-ADV066): load, setStatus(status), save, publish TRADE_UPDATED
-        //   with the new status in the "after" slot of the event.
-        throw new UnsupportedOperationException("TICKET-ADV066");
+
+        var trade = tradeRepo.findById(id)
+                .orElseThrow(() -> new TradeNotFoundException(id));
+
+        trade.setStatus(status);
+        trade.setUpdatedBy(actor);
+        trade.setUpdatedAt(LocalDateTime.now());
+
+        return tradeRepo.save(trade);
     }
 
     public void softDelete(Long id, String actor) {
-        // TODO(TICKET-ADV067): load, call t.softDelete() (sets deleted_at), save,
-        //   publish a TRADE_CANCELLED event.
         throw new UnsupportedOperationException("TICKET-ADV067");
     }
 
     @Transactional(readOnly = true)
     public Page<Trade> list(LocalDate from, LocalDate to, String status, Long counterpartyId, Pageable pageable) {
-        // TODO(TICKET-ADV055 + TICKET-ADV056): combine the static helpers from
-        //   TradeSpecifications (hasStatus, tradeDateBetween, hasCounterparty)
-        //   via Specification.where(...).and(...) and call
-        //   tradeRepo.findAll(spec, pageable). Until JPA is in place, throw.
         throw new UnsupportedOperationException("TICKET-ADV055");
     }
 }
