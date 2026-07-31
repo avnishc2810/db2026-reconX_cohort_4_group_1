@@ -1,7 +1,15 @@
 package com.dbtraining.reconx.config;
 
+import org.springdoc.core.models.GroupedOpenApi;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-// import org.springframework.context.annotation.Bean;
+
+import io.swagger.v3.oas.models.Components;
+import io.swagger.v3.oas.models.OpenAPI;
+import io.swagger.v3.oas.models.info.Contact;
+import io.swagger.v3.oas.models.info.Info;
+import io.swagger.v3.oas.models.security.SecurityRequirement;
+import io.swagger.v3.oas.models.security.SecurityScheme;
 
 /**
  * ============================================================================
@@ -16,45 +24,50 @@ import org.springframework.context.annotation.Configuration;
  * OBSERVE: After wiring, the title in the top-left of Swagger UI is
  *          "ReconX API" and a green "Authorize" button accepts bearer JWTs.
  * ============================================================================
- *
- *  TODO(TICKET-ADV058):
- *    @Bean
- *    public OpenAPI reconxOpenAPI() {
- *        return new OpenAPI()
- *            .info(new Info()
- *                .title("ReconX API")
- *                .version("v1")
- *                .description("Enterprise Trade Reconciliation Platform (Advanced Track)")
- *                .contact(new Contact().name("DB TDI Training").email("tdi@db.com")))
- *            .components(new Components().addSecuritySchemes("bearerAuth",
- *                new SecurityScheme()
- *                    .type(SecurityScheme.Type.HTTP)
- *                    .scheme("bearer")
- *                    .bearerFormat("JWT")))
- *            .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
- *    }
- *
- *  HINT: Without this bean Springdoc still produces a default OpenAPI doc —
- *        you'll see Swagger UI work, but with generic metadata and no
- *        "Authorize" button.
- * ============================================================================
  */
 @Configuration
 public class OpenApiConfig {
-//   @Bean
-//     public OpenAPI reconxOpenAPI() {
-//         return new OpenAPI()
-//              .info(new Info()
-//                  .title("ReconX API")
-//                  .version("v1")
-//                  .description("Enterprise Trade Reconciliation Platform (Advanced Track)")
-//                  .contact(new Contact().name("DB TDI Training").email("tdi@db.com")))
-//              .components(new Components().addSecuritySchemes("bearerAuth",
-//                  new SecurityScheme()
-//                      .type(SecurityScheme.Type.HTTP)
-//                      .scheme("bearer")
-//                      .bearerFormat("JWT")))
-//              .addSecurityItem(new SecurityRequirement().addList("bearerAuth"));
-//      }
-    // TODO(TICKET-ADV058): define the reconxOpenAPI() @Bean — see comments above.
+
+    @Bean
+    public OpenAPI reconxOpenAPI() {
+        return new OpenAPI()
+                .info(new Info()
+                        .title("ReconX API")
+                        .version("v1")
+                        .description("Enterprise Trade Reconciliation Platform (Advanced Track)")
+                        .contact(new Contact()
+                                .name("DB TDI Training")
+                                .email("tdi@db.com")))
+                .components(new Components()
+                        .addSecuritySchemes("bearerAuth",
+                                new SecurityScheme()
+                                        .type(SecurityScheme.Type.HTTP)
+                                        .scheme("bearer")
+                                        .bearerFormat("JWT")))
+
+                .addSecurityItem(
+                        new SecurityRequirement()
+                                .addList("bearerAuth"));
+    }
+
+    @Bean
+    public GroupedOpenApi publicApi() {
+        return GroupedOpenApi.builder()
+                .group("public")
+                .pathsToMatch(
+                        "/v1/trades/**",
+                        "/v1/recon/**")
+                .build();
+    }
+
+    @Bean
+    public GroupedOpenApi adminApi() {
+        return GroupedOpenApi.builder()
+                .group("admin")
+                .pathsToMatch(
+                        "/v1/admin/**",
+                        "/actuator/**")
+                .build();
+    }
+
 }

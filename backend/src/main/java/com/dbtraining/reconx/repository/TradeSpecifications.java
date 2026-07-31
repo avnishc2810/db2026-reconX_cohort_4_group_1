@@ -23,6 +23,12 @@ public final class TradeSpecifications {
             if (to == null)   return cb.greaterThanOrEqualTo(root.get("tradeDate"), from);
             return cb.between(root.get("tradeDate"), from, to);
         };
+        return (root, q, cb) -> {
+            if (from == null && to == null) return cb.conjunction();
+            if (from == null) return cb.lessThanOrEqualTo(root.get("tradeDate"), to);
+            if (to == null)   return cb.greaterThanOrEqualTo(root.get("tradeDate"), from);
+            return cb.between(root.get("tradeDate"), from, to);
+        };
     }
 
     public static Specification<Trade> hasCounterparty(Long counterpartyId) {

@@ -1,8 +1,8 @@
 package com.dbtraining.reconx.dto;
 
-import org.springframework.data.domain.Page;
-
 import java.util.List;
+
+import org.springframework.data.domain.Page;
 
 /**
  * TICKET-ADV053 — Tiny wrapper that flattens Spring Data Page<T> into a
