@@ -13,13 +13,14 @@ spring:
   h2:
     console:
       enabled: true
-      path: /h2
+      path: /h2-console
 
   # H2 doesn't ship a JSONB type — Liquibase preconditions in the changelog skip
   # the JSONB GIN-index step on H2 (see 003-jsonb.xml).
   jpa:
-    properties:
-      hibernate.dialect: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: validate 
 
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP:localhost:9092}
@@ -29,3 +30,4 @@ spring:
 logging:
   level:
     com.dbtraining.reconx: DEBUG
+    org.hibernate.SQL: DEBUG
