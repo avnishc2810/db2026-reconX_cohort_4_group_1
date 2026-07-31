@@ -1,78 +1,198 @@
 package com.dbtraining.reconx.service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.Test;
-
 import com.dbtraining.reconx.dto.ReconResult;
 import com.dbtraining.reconx.model.EquityTrade;
 import com.dbtraining.reconx.model.ReconciliationRule;
 import com.dbtraining.reconx.model.Side;
 import com.dbtraining.reconx.model.TradeRef;
+import com.dbtraining.reconx.model.TradeType;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-/**
- * TICKET-ADV040 / ADV041 / ADV042 — TDD: write the test FIRST, then the impl.
- */
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
 class ReconciliationEngineTest {
 
-    private final ReconciliationEngine engine = new ReconciliationEngine();
+    private ReconciliationEngine engine;
+
+    @BeforeEach
+    void setUp() {
+        engine = new ReconciliationEngine();
+    }
 
     @Test
-    void testReconcile_exactMatch_returnsMatched() {
-        EquityTrade internal = equity("EQU-20260603-0001", "100.00", "1000");
-        EquityTrade external = equity("EQU-20260603-0001", "100.00", "1000");
+    void reconcile_exactMatch_returnsMatched() {
 
-        List<ReconResult> out = engine.reconcile(
+        TradeType internal = equity(
+                "EQU-20260602-0001",
+                "100",
+                "10"
+        );
+
+        TradeType external = equity(
+                "EQU-20260602-0001",
+                "100",
+                "10"
+        );
+
+        List<ReconResult> results = engine.reconcile(
                 List.of(internal),
                 List.of(external),
-                ReconciliationRule.EXACT);
+                ReconciliationRule.EXACT
+        );
 
-        assertThat(out).hasSize(1);
-        assertThat(out.get(0).status())
-                .isEqualTo(ReconResult.Status.MATCHED);
+        assertThat(results).hasSize(1);
+
+        ReconResult result = results.get(0);
+
+        assertThat(result.tradeRef()).isEqualTo("EQU-20260602-0001");
+        assertThat(result.status()).isEqualTo(ReconResult.Status.MATCHED);
+        assertThat(result.discrepancyType()).isNull();
+        assertThat(result.details()).isNull();
     }
 
     @Test
-    void testReconcile_priceTolerance_withinThreshold() {
-        // TODO(TICKET-ADV041): prices 100.00 vs 100.50 + PRICE_TOLERANCE_1PCT rule -> status MATCHED.
-        EquityTrade internal = equity("EQU-20260603-0002", "100.00", "1000");
-        EquityTrade external = equity("EQU-20260603-0002", "100.50", "1000");
+    void reconcile_missingExternal_returnsBreak() {
 
-        List<ReconResult> out = engine.reconcile(List.of(internal), List.of(external),
-                ReconciliationRule.PRICE_TOLERANCE_1PCT);
+        TradeType internal = equity(
+                "EQU-20260602-0002",
+                "100",
+                "10"
+        );
 
-        assertThat(out.get(0).status()).isEqualTo(ReconResult.Status.MATCHED);
-        
+        List<ReconResult> results = engine.reconcile(
+                List.of(internal),
+                List.of(),
+                ReconciliationRule.EXACT
+        );
+
+        assertThat(results).hasSize(1);
+
+        ReconResult result = results.get(0);
+
+        assertThat(result.status()).isEqualTo(ReconResult.Status.BREAK);
+        assertThat(result.discrepancyType()).isEqualTo("MISSING_EXTERNAL");
+        assertThat(result.details()).contains("No external trade found");
     }
 
     @Test
-    void testReconcile_missingCounterpartyTrade_returnsBreak() {
-        // TODO(TICKET-ADV042): internal trade with no external counterpart -> status BREAK,
-        //                     discrepancyType = "MISSING_EXTERNAL".
-        org.junit.jupiter.api.Assertions.fail("TICKET-ADV042 not implemented yet");
+    void reconcile_valueMismatch_returnsBreak() {
+
+        TradeType internal = equity(
+                "EQU-20260602-0003",
+                "100",
+                "10"
+        );
+
+        TradeType external = equity(
+                "EQU-20260602-0003",
+                "100",
+                "12"
+        );
+
+        List<ReconResult> results = engine.reconcile(
+                List.of(internal),
+                List.of(external),
+                ReconciliationRule.EXACT
+        );
+
+        assertThat(results).hasSize(1);
+
+        ReconResult result = results.get(0);
+
+        assertThat(result.status()).isEqualTo(ReconResult.Status.BREAK);
+        assertThat(result.discrepancyType()).isEqualTo("VALUE_MISMATCH");
+        assertThat(result.details()).contains("internal=");
     }
 
     @Test
-    void testReconcile_emptyInternal_returnsEmpty() {
-        List<ReconResult> out = engine.reconcile(
+    void reconcile_emptyInternal_returnsEmptyList() {
+
+        List<ReconResult> results = engine.reconcile(
                 List.of(),
                 List.of(),
-                ReconciliationRule.EXACT);
+                ReconciliationRule.EXACT
+        );
 
-        assertThat(out).isEmpty();
+        assertThat(results).isEmpty();
     }
 
-    private EquityTrade equity(String ref, String price, String qty) {
+    @Test
+    void reconcile_nullInternal_returnsEmptyList() {
+
+        List<ReconResult> results = engine.reconcile(
+                null,
+                List.of(),
+                ReconciliationRule.EXACT
+        );
+
+        assertThat(results).isEmpty();
+    }
+
+    @Test
+    void reconcile_nullExternal_returnsBreak() {
+
+        TradeType internal = equity(
+                "EQU-20260602-0004",
+                "100",
+                "10"
+        );
+
+        List<ReconResult> results = engine.reconcile(
+                List.of(internal),
+                null,
+                ReconciliationRule.EXACT
+        );
+
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).status()).isEqualTo(ReconResult.Status.BREAK);
+        assertThat(results.get(0).discrepancyType()).isEqualTo("MISSING_EXTERNAL");
+    }
+
+    @Test
+    void reconcileByCounterparty_matchesInParallel()
+            throws ExecutionException, InterruptedException {
+
+        TradeType trade = equity(
+                "EQU-20260602-0005",
+                "100",
+                "10"
+        );
+
+        Map<Long, List<TradeType>> internal = Map.of(
+                1L, List.of(trade)
+        );
+
+        Map<Long, List<TradeType>> external = Map.of(
+                1L, List.of(trade)
+        );
+
+        List<ReconResult> results = engine.reconcileByCounterparty(
+                internal,
+                external,
+                ReconciliationRule.EXACT
+        ).get();
+
+        assertThat(results).hasSize(1);
+        assertThat(results.get(0).status()).isEqualTo(ReconResult.Status.MATCHED);
+    }
+
+    private EquityTrade equity(String ref, String qty, String price) {
+
         return EquityTrade.builder()
                 .tradeRef(TradeRef.of(ref))
                 .instrumentSymbol("SAP.DE")
-                .price(new BigDecimal(price))
                 .quantity(new BigDecimal(qty))
-                .currency("EUR").side(Side.BUY)
-                .tradeDate(LocalDate.of(2026, 6, 3))
+                .price(new BigDecimal(price))
+                .currency("EUR")
+                .side(Side.BUY)
+                .tradeDate(LocalDate.of(2026, 6, 2))
                 .counterpartyId(1L)
                 .build();
     }

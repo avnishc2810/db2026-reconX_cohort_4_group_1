@@ -1,7 +1,6 @@
 package com.dbtraining.reconx.model;
 
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 
@@ -9,19 +8,120 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ReconciliationRuleTest {
 
-    @ParameterizedTest(name = "rule={0} priceA={1} priceB={2} qtyA={3} qtyB={4} expected={5}")
-    @CsvSource({
-            "EXACT,                100.00, 100.00, 10, 10, true",
-            "EXACT,                100.00, 100.01, 10, 10, false",
-            "PRICE_TOLERANCE_1PCT, 100.00, 100.50, 10, 10, true",
-            "PRICE_TOLERANCE_1PCT, 100.00, 102.00, 10, 10, false",
-            "QTY_TOLERANCE_5UNITS, 100.00, 100.00, 10, 14, true",
-            "QTY_TOLERANCE_5UNITS, 100.00, 100.00, 10, 16, false",
-            "LOOSE,                100.00, 104.00, 10, 18, true"
-    })
-    void matches(ReconciliationRule rule, BigDecimal pa, BigDecimal pb,
-                 BigDecimal qa, BigDecimal qb, boolean expected) {
-        // TODO(TICKET-ADV026): assert rule.matches(pa, qa, pb, qb) equals expected for each CSV row.
-        org.junit.jupiter.api.Assertions.fail("TICKET-ADV026 not implemented yet");
+    @Test
+    void exact_samePriceAndQuantity_matches() {
+        assertThat(ReconciliationRule.EXACT.matches(
+                new BigDecimal("100"),
+                new BigDecimal("10"),
+                new BigDecimal("100"),
+                new BigDecimal("10")
+        )).isTrue();
+    }
+
+    @Test
+    void exact_priceDrift_doesNotMatch() {
+        assertThat(ReconciliationRule.EXACT.matches(
+                new BigDecimal("100"),
+                new BigDecimal("10"),
+                new BigDecimal("100.01"),
+                new BigDecimal("10")
+        )).isFalse();
+    }
+
+    @Test
+    void exact_quantityDrift_doesNotMatch() {
+        assertThat(ReconciliationRule.EXACT.matches(
+                new BigDecimal("100"),
+                new BigDecimal("10"),
+                new BigDecimal("100"),
+                new BigDecimal("11")
+        )).isFalse();
+    }
+
+    @Test
+    void priceTolerance1Pct_withinTolerance_matches() {
+        assertThat(ReconciliationRule.PRICE_TOLERANCE_1PCT.matches(
+                new BigDecimal("100"),
+                new BigDecimal("10"),
+                new BigDecimal("100.5"),
+                new BigDecimal("10")
+        )).isTrue();
+    }
+
+    @Test
+    void priceTolerance1Pct_outsideTolerance_fails() {
+        assertThat(ReconciliationRule.PRICE_TOLERANCE_1PCT.matches(
+                new BigDecimal("100"),
+                new BigDecimal("10"),
+                new BigDecimal("102"),
+                new BigDecimal("10")
+        )).isFalse();
+    }
+
+    @Test
+    void qtyTolerance5Units_withinTolerance_matches() {
+        assertThat(ReconciliationRule.QTY_TOLERANCE_5UNITS.matches(
+                new BigDecimal("100"),
+                new BigDecimal("10"),
+                new BigDecimal("100"),
+                new BigDecimal("14")
+        )).isTrue();
+    }
+
+    @Test
+    void qtyTolerance5Units_outsideTolerance_fails() {
+        assertThat(ReconciliationRule.QTY_TOLERANCE_5UNITS.matches(
+                new BigDecimal("100"),
+                new BigDecimal("10"),
+                new BigDecimal("100"),
+                new BigDecimal("16")
+        )).isFalse();
+    }
+
+    @Test
+    void looseRule_allowsPriceAndQuantityDrift() {
+        assertThat(ReconciliationRule.LOOSE.matches(
+                new BigDecimal("100"),
+                new BigDecimal("100"),
+                new BigDecimal("104"),
+                new BigDecimal("108")
+        )).isTrue();
+    }
+
+    @Test
+    void looseRule_priceTooLarge_fails() {
+        assertThat(ReconciliationRule.LOOSE.matches(
+                new BigDecimal("100"),
+                new BigDecimal("100"),
+                new BigDecimal("106"),
+                new BigDecimal("108")
+        )).isFalse();
+    }
+
+    @Test
+    void looseRule_quantityTooLarge_fails() {
+        assertThat(ReconciliationRule.LOOSE.matches(
+                new BigDecimal("100"),
+                new BigDecimal("100"),
+                new BigDecimal("104"),
+                new BigDecimal("111")
+        )).isFalse();
+    }
+
+    @Test
+    void zeroInternalPrice_isHandledWithoutDivideByZero() {
+        assertThat(ReconciliationRule.EXACT.matches(
+                BigDecimal.ZERO,
+                new BigDecimal("10"),
+                BigDecimal.ZERO,
+                new BigDecimal("10")
+        )).isTrue();
+
+        assertThat(ReconciliationRule.EXACT.matches(
+                BigDecimal.ZERO,
+                new BigDecimal("10"),
+                new BigDecimal("1"),
+                new BigDecimal("10")
+        )).isFalse();
     }
 }
