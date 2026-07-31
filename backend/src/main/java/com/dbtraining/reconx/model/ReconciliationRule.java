@@ -41,23 +41,25 @@ public enum ReconciliationRule {
      *         are within tolerance.
      */
     public boolean matches(BigDecimal internalPrice, BigDecimal internalQty,
-                           BigDecimal externalPrice, BigDecimal externalQty) {
-        BigDecimal priceDiff = internalPrice.subtract(externalPrice).abs();
-        BigDecimal priceDiffPct = internalPrice.signum() == 0
-                ? BigDecimal.ZERO
-                : priceDiff.divide(internalPrice, 6, java.math.RoundingMode.HALF_UP);
-        BigDecimal qtyDiff = internalQty.subtract(externalQty).abs();
+                       BigDecimal externalPrice, BigDecimal externalQty) {
 
-        boolean priceOk = priceDiffPct.compareTo(priceTolerancePct) <= 0;
-        boolean qtyOk   = qtyDiff.compareTo(qtyToleranceAbs) <= 0;
-        return priceOk && qtyOk;
-        
-        // TODO(TICKET-ADV026):
-        //   1. Compute |internalPrice - externalPrice| as priceDiff.
-        //   2. priceDiffPct = priceDiff / internalPrice (guard divide-by-zero).
-        //   3. qtyDiff = |internalQty - externalQty|.
-        //   4. Return true iff priceDiffPct <= priceTolerancePct AND
-        //      qtyDiff <= qtyToleranceAbs.
-        //throw new UnsupportedOperationException("TICKET-ADV026");
+    if (internalPrice.signum() == 0) {
+        return externalPrice.signum() == 0
+                && internalQty.subtract(externalQty).abs()
+                        .compareTo(qtyToleranceAbs) <= 0;
     }
+
+    BigDecimal priceDiff = internalPrice.subtract(externalPrice).abs();
+    BigDecimal priceDiffPct = priceDiff.divide(
+            internalPrice.abs(),
+            6,
+            java.math.RoundingMode.HALF_UP);
+
+    BigDecimal qtyDiff = internalQty.subtract(externalQty).abs();
+
+    boolean priceOk = priceDiffPct.compareTo(priceTolerancePct) <= 0;
+    boolean qtyOk = qtyDiff.compareTo(qtyToleranceAbs) <= 0;
+
+    return priceOk && qtyOk;
+}
 }
