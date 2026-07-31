@@ -1,0 +1,44 @@
+server:
+  port: 8080
+
+spring:
+  jmx:
+    enabled: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/reconx
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+    show-sql: true
+
+  jackson:
+    serialization:
+      WRITE_DATES_AS_TIMESTAMPS: false
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+reconx:
+  security:
+    jwt:
+      secret: ${APP_JWT_SECRET:dev-default-secret}
+      expiration-minutes: 60
+      issuer: reconx-app
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
