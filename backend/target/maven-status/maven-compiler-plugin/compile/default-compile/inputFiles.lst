@@ -35,6 +35,7 @@ C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraini
 C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\model\TradeRef.java
 C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\model\TradeType.java
 C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\observability\DatabaseHealthIndicator.java
+C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\observability\ReconMetrics.java
 C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\observability\TradeMetrics.java
 C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\ReconxApplication.java
 C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\repository\AppUserRepository.java
@@ -55,5 +56,6 @@ C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraini
 C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\security\SecurityConfig.java
 C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\service\InstrumentService.java
 C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\service\ReconciliationEngine.java
+C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\service\ReconciliationService.java
 C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\service\TradeAnalyticsService.java
 C:\Users\Admin\db2026-reconX_cohort_4_group_1\backend\src\main\java\com\dbtraining\reconx\service\TradeService.java
