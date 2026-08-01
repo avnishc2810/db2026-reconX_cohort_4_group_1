@@ -1,7 +1,13 @@
 package com.dbtraining.reconx.repository.entity;
 
-import jakarta.persistence.*;
 import java.time.Instant;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 /**
  * TICKET-ADV132 / ADV137 — Append-only audit row written by AuditEventConsumer.
@@ -60,4 +66,32 @@ public class AuditLogEntry {
     public String getActor()         { return actor; }
     public String getBeforeState()   { return beforeState; }
     public String getAfterState()    { return afterState; }
+
+    public void setEventId(String eventId) {
+        this.eventId = eventId;
+    }
+
+    public void setTradeRef(String tradeRef) {
+        this.tradeRef = tradeRef;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
+    }
+
+    public void setEventTimestamp(Instant eventTimestamp) {
+        this.eventTimestamp = eventTimestamp;
+    }
+
+    public void setActor(String actor) {
+        this.actor = actor;
+    }
+
+    public void setBeforeState(String beforeState) {
+        this.beforeState = beforeState;
+    }
+
+    public void setAfterState(String afterState) {
+        this.afterState = afterState;
+    }
 }
