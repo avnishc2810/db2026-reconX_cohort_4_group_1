@@ -1,11 +1,13 @@
 package com.dbtraining.reconx.observability;
 
+import org.springframework.stereotype.Component;
+
 import com.dbtraining.reconx.repository.ReconBreakRepository;
+
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.springframework.stereotype.Component;
 
 /**
  * ============================================================================
@@ -63,6 +65,7 @@ public class TradeMetrics {
     }
 
     public void recordTradeValue(double value) {
-        // TODO(TICKET-ADV086): record the value on the tradeValue distribution summary.
+        //(TICKET-ADV086): record the value on the tradeValue distribution summary.
+        tradeValue.record(value);
     }
 }
