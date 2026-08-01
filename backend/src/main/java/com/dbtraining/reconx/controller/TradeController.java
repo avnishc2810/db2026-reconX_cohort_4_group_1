@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -32,8 +34,8 @@ import com.dbtraining.reconx.service.TradeService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-
 /**
  * ============================================================================
  * TICKET-ADV063-ADV067 — TradeController (full CRUD + filterable list)
@@ -117,6 +119,27 @@ public class TradeController {
         service.softDelete(id, String.valueOf(principal));
 
         return ResponseEntity.noContent().build();
+    }
+
+
+
+    @Deprecated(since = "v1.4.0", forRemoval = true)
+    @GetMapping(value = "/old-search", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> oldSearch(HttpServletResponse response) {
+
+        response.setHeader("Deprecation", "true");
+
+        response.setHeader(
+                "Sunset",
+                "Sat, 1 Jul 2026 00:00:00 GMT"
+        );
+
+        response.setHeader(
+                "Link",
+                "</api/v1/trades?status=...>; rel=\"successor-version\""
+        );
+
+        return ResponseEntity.status(HttpStatus.GONE).build();
     }
 
 
