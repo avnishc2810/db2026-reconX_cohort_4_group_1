@@ -1,4 +1,4 @@
-# TICKET-ADV093 / ADV094 — Prometheus alert rules
+# TICKET-ADV093 — Prometheus alert: TooManyReconBreaks (recon_break_count > 50 for 5 min)
 groups:
   - name: reconx-business
     rules:
