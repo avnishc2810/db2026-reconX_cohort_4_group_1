@@ -1,4 +1,4 @@
-// TICKET-ADV106 / ADV107 — EventSource live feed with prepend + slide-in animation.
+// TICKET-ADV105 — SSE handler with prepend-and-animate and DOM cap at 50 entries
 (function () {
   const feed = document.getElementById('trade-feed');
   if (!feed) return;
@@ -21,6 +21,9 @@
       <span> price=${trade.price} </span>
       <span> [${trade.status}]</span>`;
     feed.prepend(el);
+    while (feed.children.length > 50) {
+      feed.lastElementChild.remove();
+    }
   }
 
   demoEvents.forEach((e, i) => setTimeout(() => prepend(e), 500 * i));
