@@ -82,7 +82,7 @@ management:
 reconx:
   security:
     jwt:
-      secret: ${JWT_SECRET:dev-secret-change-me-32-bytes-min!!}
+      secret: ${JWT_SECRET:ThisIsAVeryLongSecretKeyThatMustBeAtLeast32Characters}
       expiration-minutes: ${JWT_EXP_MIN:60}
       refresh-expiration-days: ${JWT_REFRESH_EXP_DAYS:7}
       issuer: reconx
