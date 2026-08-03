@@ -23,15 +23,26 @@
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 }
     },
     {
-      "type": "stat",
-      "title": "Open recon breaks (ADV091)",
-      "datasource": { "type": "prometheus", "uid": "reconx-prometheus" },
-      "targets": [{ "expr": "recon_break_count" }],
-      "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 }
-    },
+  "type": "stat",
+  "title": "Open recon breaks (ADV091)",
+  "datasource": { "type": "prometheus", "uid": "reconx-prometheus" },
+  "targets": [{ "expr": "recon_break_count" }],
+  "gridPos": { "h": 4, "w": 6, "x": 0, "y": 8 }
+},
+{
+  "type": "stat",
+  "title": "DLQ message count",
+  "datasource": { "type": "prometheus", "uid": "reconx-prometheus" },
+  "targets": [
     {
-      "type": "timeseries",
-      "title": "Trades created / sec (ADV089)",
+      "expr": "sum(kafka_consumer_records_consumed_total{topic=\"trade-events-dlq\"})"
+    }
+  ],
+  "gridPos": { "h": 4, "w": 6, "x": 6, "y": 8 }
+},
+{
+  "type": "timeseries",
+  "title": "Trades created / sec (ADV089)",
       "datasource": { "type": "prometheus", "uid": "reconx-prometheus" },
       "targets": [{ "expr": "sum(rate(trade_created_total[1m]))" }],
       "gridPos": { "h": 8, "w": 12, "x": 6, "y": 8 }
