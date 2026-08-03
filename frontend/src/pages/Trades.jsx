@@ -30,13 +30,15 @@ function Trades() {
   useEffect(() => {
     async function loadTrades() {
       try {
-        const params = { page };
+        const params = new URLSearchParams();
+
+        params.set("page", page);
 
         if (debounced) {
-          params.status = debounced;
+          params.set("status", debounced);
         }
 
-        const result = await api.listTrades(params);
+        const result = await api.listTrades(params.toString());
         setData(result);
       } catch (err) {
         console.error(err);
@@ -61,12 +63,12 @@ function Trades() {
         onChange={(e) => setSearch(e.target.value.toUpperCase())}
       />
 
-      <DataTable>
+      {/* <DataTable>
         <DataTable.Header
           columns={[
             { key: 'tradeRef', label: 'Ref' },
-            { key: 'symbol', label: 'Symbol' },
-            { key: 'qty', label: 'Qty' },
+            { key: 'instrumentSymbol', label: 'Instrument' },
+            { key: 'quantity', label: 'Quantity' },
             { key: 'price', label: 'Price' },
             { key: 'status', label: 'Status' },
           ]}
@@ -88,7 +90,36 @@ function Trades() {
           totalPages={Math.max(1, data.totalPages)}
           onChange={setPage}
         />
+      </DataTable> */}
+
+      <DataTable>
+        <DataTable.Header
+          columns={[
+            { key: "tradeRef", label: "Ref" },
+            { key: "instrumentSymbol", label: "Instrument" },
+            { key: "quantity", label: "Quantity" },
+            { key: "price", label: "Price" },
+            { key: "status", label: "Status" },
+          ]}
+        />
+
+        <DataTable.Body
+          rows={data.items}
+          render={(trade) => (
+            <TradeRow
+              key={trade.id}
+              trade={trade}
+              onClick={handleSelect}
+            />
+          )}
+        />
       </DataTable>
+
+      <DataTable.Pagination
+        page={page}
+        totalPages={Math.max(1, data.totalPages)}
+        onChange={setPage}
+      />
     </section>
   );
 }

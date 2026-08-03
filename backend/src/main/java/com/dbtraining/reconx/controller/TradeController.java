@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.dbtraining.reconx.dto.PagedResponse;
 import com.dbtraining.reconx.dto.TradeMapper;
@@ -30,6 +31,7 @@ import com.dbtraining.reconx.dto.TradeRequest;
 import com.dbtraining.reconx.dto.TradeResponse;
 import com.dbtraining.reconx.repository.entity.Trade;
 import com.dbtraining.reconx.service.TradeService;
+import com.dbtraining.reconx.service.TradeStreamService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -54,9 +56,12 @@ public class TradeController {
     private final TradeService service;
     private final TradeMapper mapper;
 
-    public TradeController(TradeService service, TradeMapper mapper) {
+    private final TradeStreamService tradeStreamService;
+
+    public TradeController(TradeService service, TradeMapper mapper, TradeStreamService tradeStreamService) {
         this.service = service;
         this.mapper = mapper;
+        this.tradeStreamService = tradeStreamService;
     }
 
     @GetMapping
@@ -142,5 +147,10 @@ public class TradeController {
         return ResponseEntity.status(HttpStatus.GONE).build();
     }
 
+
+    @GetMapping(path = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter streamTrades() {
+        return tradeStreamService.subscribe();
+    }
 
 }

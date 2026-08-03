@@ -4,7 +4,7 @@ function TradeRowImpl({ trade, onClick }) {
   return (
     <tr onClick={() => onClick(trade.id)}>
       <td>{trade.tradeRef}</td>
-      <td>{trade.instrument}</td>
+      <td>{trade.instrumentSymbol}</td>
       <td>{trade.quantity}</td>
       <td>{trade.price}</td>
       <td>

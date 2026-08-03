@@ -133,11 +133,18 @@ export const api = {
 
   // ---------------- Trades ----------------
 
-  listTrades(params = "") {
-    const query = params ? `?${params}` : "";
-    return request("GET", `/v1/trades${query}`);
-  },
+  // listTrades(params = "") {
+  //   const query = params ? `?${params}` : "";
+  //   return request("GET", `/v1/trades${query}`);
+  // },
+  listTrades(params = {}) {
+      const query = new URLSearchParams(params).toString();
 
+      return request(
+          "GET",
+          `/v1/trades${query ? `?${query}` : ""}`
+      );
+  },
   createTrade(req) {
     return request("POST", "/v1/trades", req);
   },
