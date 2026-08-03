@@ -55,7 +55,6 @@ public class TradeController {
 
     private final TradeService service;
     private final TradeMapper mapper;
-
     private final TradeStreamService tradeStreamService;
 
     public TradeController(TradeService service, TradeMapper mapper, TradeStreamService tradeStreamService) {
@@ -86,7 +85,6 @@ public class TradeController {
 
         Trade saved = service.create(req, actor);
         TradeResponse response = mapper.toResponse(saved);
-        tradeStreamService.broadcast(response);
 
         return ResponseEntity
                 .created(URI.create("/api/v1/trades/" + saved.getId()))
@@ -101,7 +99,6 @@ public class TradeController {
 
         TradeResponse response = mapper.toResponse(
                 service.update(id, req, String.valueOf(principal)));
-        tradeStreamService.broadcast(response);
         return response;
     }
 
@@ -115,7 +112,6 @@ public class TradeController {
 
         TradeResponse response = mapper.toResponse(
                 service.updateStatus(id, status, String.valueOf(principal)));
-        tradeStreamService.broadcast(response);
         return response;
     }
 

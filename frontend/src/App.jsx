@@ -2,6 +2,7 @@
 import React, { Suspense, lazy } from 'react';
 import { Routes, Route, Link, Navigate } from 'react-router-dom';
 import { withErrorBoundary } from '@components/withErrorBoundary.jsx';
+import { useTheme } from '@context/ThemeContext.jsx';
 
 // TODO(TICKET-ADV122): wrap each page import in React.lazy() so Vite emits a
 // separate chunk per route. The <Suspense> fallback below shows while the
@@ -12,15 +13,36 @@ const AddTrade  = lazy(() => import('@pages/AddTrade.jsx'));
 const Login     = lazy(() => import('@pages/Login.jsx'));
 
 function App() {
+  const { theme, setTheme } = useTheme();
+
   return (
     <div className="layout">
       <header className="layout__header">
-        <h1>ReconX</h1>
+        <div className="brand">
+          <span className="brand__mark" aria-hidden="true">R</span>
+          <div>
+            <h1>ReconX</h1>
+            <span className="brand__tagline">Trade intelligence, clarified</span>
+          </div>
+        </div>
         <nav className="layout__nav">
           <Link to="/">Dashboard</Link>
           <Link to="/trades">Trades</Link>
           <Link to="/trades/new">Add trade</Link>
         </nav>
+        <div className="theme-switcher" aria-label="Appearance">
+          {['light', 'dark', 'ambient'].map((option) => (
+            <button
+              key={option}
+              type="button"
+              className={theme === option ? 'theme-switcher__button is-active' : 'theme-switcher__button'}
+              onClick={() => setTheme(option)}
+              aria-pressed={theme === option}
+            >
+              {option}
+            </button>
+          ))}
+        </div>
       </header>
       <main className="layout__main">
         <Suspense fallback={<div className="loader">Loading…</div>}>

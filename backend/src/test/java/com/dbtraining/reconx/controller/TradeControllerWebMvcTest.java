@@ -3,6 +3,7 @@ package com.dbtraining.reconx.controller;
 import com.dbtraining.reconx.dto.TradeMapper;
 import com.dbtraining.reconx.security.JwtAuthenticationFilter;
 import com.dbtraining.reconx.service.TradeService;
+import com.dbtraining.reconx.service.TradeStreamService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ class TradeControllerWebMvcTest {
 
     @MockBean
     private TradeMapper tradeMapper;
+
+    @MockBean
+    private TradeStreamService tradeStreamService;
 
     @MockBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;

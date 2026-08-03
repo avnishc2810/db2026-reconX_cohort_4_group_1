@@ -1,8 +1,12 @@
 package com.dbtraining.reconx.repository;
 
 import java.time.LocalDate;
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -45,6 +49,14 @@ public interface TradeRepository
                 JpaSpecificationExecutor<Trade> {
 
     Optional<Trade> findByTradeRef(String tradeRef);
+
+    /**
+     * Locks available opposite-side legs while a new trade is reconciled, so
+     * concurrent creates cannot match the same trade twice.
+     */
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    List<Trade> findByInstrument_IdAndSideAndStatusInOrderByCreatedAtAscIdAsc(
+            Long instrumentId, String side, Collection<String> statuses);
 
     @EntityGraph(attributePaths = {
             "instrument",

@@ -4,6 +4,7 @@
 import React, { useMemo } from 'react';
 import { withAuth } from '@components/withAuth.jsx';
 import { useTradeStream } from '@hooks/useTradeStream.js';
+import { summariseReconciliation } from '@/utils/reconciliation.js';
 
 function StatCard({ label, value }) {
   return (
@@ -29,19 +30,10 @@ function Dashboard() {
   );
 
   // Trade statistics
-  const { matched, breaks } = useMemo(() => {
-    const matched = trades.filter(
-      (trade) => trade.status === 'MATCHED'
-    ).length;
-
-    const breaks = trades.filter(
-      (trade) =>
-        trade.status === 'UNMATCHED' ||
-        trade.status === 'DISPUTED'
-    ).length;
-
-    return { matched, breaks };
-  }, [trades]);
+  const { matched, openBreaks } = useMemo(
+    () => summariseReconciliation(trades),
+    [trades]
+  );
 
   return (
     <section>
@@ -65,7 +57,7 @@ function Dashboard() {
 
         <StatCard
           label="Open breaks"
-          value={breaks}
+          value={openBreaks}
         />
       </div>
 
