@@ -1,15 +1,60 @@
-// TICKET-ADV116 — useTradeStream() — SSE subscription returning live trades.
-import { useState } from 'react';
+// TICKET-ADV116 — useTradeStream() with Server-Sent Events (SSE)
 
-export function useTradeStream(url = '/api/v1/trades/stream') {
-  // TODO(TICKET-ADV116): subscribe to the SSE endpoint with `new EventSource(url)`.
-  //                     - onopen   -> setConnected(true)
-  //                     - onmessage(e) -> JSON.parse(e.data), prepend to `trades`,
-  //                       cap the list at ~200 items so the UI doesn't blow up.
-  //                     - onerror  -> setConnected(false)
-  //                     Close the EventSource in the effect cleanup.
-  const [trades /*, setTrades */] = useState([]);
-  const [isConnected /*, setConnected */] = useState(false);
+import { useEffect, useState } from "react";
 
-  return { trades, isConnected };
+const MAX_BUFFER = 200;
+
+export function useTradeStream(url = "/api/v1/trades/stream") {
+  const [trades, setTrades] = useState([]);
+  const [isConnected, setIsConnected] = useState(false);
+
+  useEffect(() => {
+    const eventSource = new EventSource(url);
+
+    eventSource.onopen = () => {
+      setIsConnected(true);
+    };
+
+    eventSource.onmessage = (event) => {
+      try {
+        const trade = JSON.parse(event.data);
+
+        setTrades((prev) =>
+          [trade, ...prev].slice(0, MAX_BUFFER)
+        );
+      } catch {
+        // Ignore malformed JSON
+      }
+    };
+
+    // Optional named event support
+    eventSource.addEventListener("trade-matched", (event) => {
+      try {
+        const updatedTrade = JSON.parse(event.data);
+
+        setTrades((prev) =>
+          prev.map((trade) =>
+            trade.id === updatedTrade.id
+              ? { ...trade, ...updatedTrade }
+              : trade
+          )
+        );
+      } catch {
+        // Ignore malformed JSON
+      }
+    });
+
+    eventSource.onerror = () => {
+      setIsConnected(false);
+    };
+
+    return () => {
+      eventSource.close();
+    };
+  }, [url]);
+
+  return {
+    trades,
+    isConnected,
+  };
 }
