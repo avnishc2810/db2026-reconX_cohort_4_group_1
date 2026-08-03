@@ -30,13 +30,23 @@ function Trades() {
       <DataTable>
         <DataTable.Header columns={[
           { key: 'tradeRef', label: 'Ref' },
-          { key: 'symbol',   label: 'Symbol' },
-          { key: 'qty',      label: 'Qty' },
-          { key: 'price',    label: 'Price' },
-          { key: 'status',   label: 'Status' },
+          { key: 'symbol', label: 'Symbol' },
+          { key: 'qty', label: 'Qty' },
+          { key: 'price', label: 'Price' },
+          { key: 'status', label: 'Status' },
         ]} />
-        {/* TODO(TICKET-ADV114): render a DataTable.Body with `rows={data.items}`
-            and a `render` prop that returns one <span> per column. */}
+        <DataTable.Body
+          rows={data.items}
+          render={(trade) => (
+            <>
+              <span>{trade.tradeRef}</span>
+              <span>{trade.symbol}</span>
+              <span>{trade.qty}</span>
+              <span>{trade.price}</span>
+              <span>{trade.status}</span>
+            </>
+          )}
+        />
         <DataTable.Pagination
           page={page}
           totalPages={Math.max(1, data.totalPages)}
