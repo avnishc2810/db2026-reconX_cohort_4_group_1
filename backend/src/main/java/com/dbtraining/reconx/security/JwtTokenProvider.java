@@ -78,7 +78,7 @@ public class JwtTokenProvider {
                 .issuer(issuer)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(exp))
-                .claims(Map.of("rol e", role))
+                .claims(Map.of("role", role))
                 .signWith(key)
                 .compact();
     }
