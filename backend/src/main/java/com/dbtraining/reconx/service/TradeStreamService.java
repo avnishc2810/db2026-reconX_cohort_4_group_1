@@ -9,7 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
-import com.dbtraining.reconx.repository.entity.Trade;
+import com.dbtraining.reconx.dto.TradeResponse;
 
 @Service
 public class TradeStreamService {
@@ -35,7 +35,7 @@ public class TradeStreamService {
         return emitter;
     }
 
-    public void broadcast(Trade trade) {
+    public void broadcast(TradeResponse trade) {
         List<SseEmitter> dead = new ArrayList<>();
 
         for (SseEmitter emitter : emitters) {

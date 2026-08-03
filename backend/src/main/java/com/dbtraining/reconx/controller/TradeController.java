@@ -85,10 +85,12 @@ public class TradeController {
         String actor = String.valueOf(principal);
 
         Trade saved = service.create(req, actor);
+        TradeResponse response = mapper.toResponse(saved);
+        tradeStreamService.broadcast(response);
 
         return ResponseEntity
                 .created(URI.create("/api/v1/trades/" + saved.getId()))
-                .body(mapper.toResponse(saved));
+                .body(response);
     }
 
     @PutMapping("/{id}")
@@ -97,9 +99,10 @@ public class TradeController {
                                 @Valid @RequestBody TradeRequest req,
                                 @AuthenticationPrincipal Object principal) {
 
-        return mapper.toResponse(
-                service.update(id, req, String.valueOf(principal))
-        );
+        TradeResponse response = mapper.toResponse(
+                service.update(id, req, String.valueOf(principal)));
+        tradeStreamService.broadcast(response);
+        return response;
     }
 
     @PatchMapping("/{id}/status")
@@ -110,9 +113,10 @@ public class TradeController {
 
         String status = body.get("status");
 
-        return mapper.toResponse(
-                service.updateStatus(id, status, String.valueOf(principal))
-        );
+        TradeResponse response = mapper.toResponse(
+                service.updateStatus(id, status, String.valueOf(principal)));
+        tradeStreamService.broadcast(response);
+        return response;
     }
 
     @DeleteMapping("/{id}")
