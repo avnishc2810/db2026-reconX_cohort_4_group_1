@@ -97,6 +97,10 @@ public class TradeService {
 
         Trade saved = tradeRepo.save(trade);
         Trade reconciled = reconcileNewTrade(saved);
+        metrics.incrementTradeCreated();
+        metrics.recordTradeValue(reconciled.getQuantity()
+                .multiply(reconciled.getPrice())
+                .doubleValue());
         publish(reconciled);
         return reconciled;
     }

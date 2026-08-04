@@ -2,11 +2,13 @@ package com.dbtraining.reconx.observability;
 
 import com.dbtraining.reconx.repository.ReconBreakRepository;
 import io.micrometer.core.instrument.Counter;
+import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+
+import java.lang.reflect.Proxy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -22,7 +24,10 @@ class TradeMetricsTest {
     @BeforeEach
     void setUp() {
         registry = new SimpleMeterRegistry();
-        breakRepo = Mockito.mock(ReconBreakRepository.class);
+        breakRepo = (ReconBreakRepository) Proxy.newProxyInstance(
+                getClass().getClassLoader(),
+                new Class<?>[]{ReconBreakRepository.class},
+                (proxy, method, args) -> method.getName().equals("countByStatus") ? 0L : null);
         metrics = new TradeMetrics(registry, breakRepo);
     }
 
@@ -36,5 +41,16 @@ class TradeMetricsTest {
         metrics.incrementTradeCreated();
 
         assertThat(counter.count()).isEqualTo(2.0);
+    }
+
+    @Test
+    void recordTradeValue_recordsDistributionSummary() {
+        DistributionSummary summary = registry.find("trade_value_total").summary();
+        assertThat(summary).isNotNull();
+
+        metrics.recordTradeValue(100.25);
+
+        assertThat(summary.count()).isEqualTo(1);
+        assertThat(summary.totalAmount()).isEqualTo(100.25);
     }
 }
